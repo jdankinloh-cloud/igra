@@ -236,10 +236,12 @@ body{
 
 /* ================= ГОНКА ================= */
 .turnbar{
-  margin-top:10px;color:#fff;font-weight:900;font-size:1.15rem;text-align:center;padding:11px;border-radius:18px;
+  margin-top:10px;color:#fff;text-align:center;padding:9px 14px 11px;border-radius:18px;
   box-shadow:0 5px 0 rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.3);
   transition:background .3s,box-shadow .3s;
 }
+.turn-lab{display:block;font-size:.78rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;opacity:.92}
+.turn-name{display:block;font-size:1.9rem;font-weight:900;line-height:1.1;text-shadow:0 3px 0 rgba(0,0,0,.3);word-break:break-word}
 .board{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:12px;position:relative}
 .cell{
   position:relative;aspect-ratio:1;border-radius:12px;display:grid;place-items:center;
@@ -1395,13 +1397,18 @@ function placePawns(instant){
     const idxs=byPos[pos], cell=cellByPos[pos];
     const cx=cell.offsetLeft+cell.offsetWidth/2, cy=cell.offsetTop+cell.offsetHeight/2;
     const n=idxs.length;
-    const offs=n===1?[[0,0]]:n===2?[[-.55,0],[.55,0]]:n===3?[[-.55,-.35],[.55,-.35],[0,.55]]:[[-.55,-.35],[.55,-.35],[-.55,.55],[.55,.55]];
+    const frac=n===1?0.46:n===2?0.4:n===3?0.36:0.33;
+    const offs=n===1?[[0,0]]
+      :n===2?[[-0.19,0],[0.19,0]]
+      :n===3?[[-0.2,-0.17],[0.2,-0.17],[0,0.2]]
+      :[[-0.19,-0.19],[0.19,-0.19],[-0.19,0.19],[0.19,0.19]];
     idxs.forEach((pi,k)=>{
       const pn=pawns[pi];
-      const s=Math.min(cell.offsetWidth*.45,26);
+      const s=Math.max(13,Math.round(cell.offsetWidth*frac));
       pn.style.width=s+'px'; pn.style.height=s+'px';
       pn.style.left=(cx+offs[k][0]*cell.offsetWidth-s/2)+'px';
       pn.style.top=(cy+offs[k][1]*cell.offsetHeight-s/2)+'px';
+      pn.style.zIndex=6+k;
       if(instant){ pn.classList.add('noanim'); }
     });
   });
@@ -1413,7 +1420,7 @@ function placePawns(instant){
 function updateRaceUI(){
   const cur=R.players[R.cur];
   const tb=$('#race-turn');
-  tb.textContent='Ход: '+cur.name;
+  tb.innerHTML='<span class="turn-lab">Ход</span><span class="turn-name">'+cur.name+'</span>';
   tb.style.background='linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 60%),'+cur.color;
   tb.style.boxShadow='0 5px 0 rgba(0,0,0,.3),0 0 24px -6px '+cur.color+',inset 0 2px 0 rgba(255,255,255,.3)';
   const rb=$('#race-roll');
@@ -1579,7 +1586,7 @@ function buildChestBoard(){
 function updateChestUI(){
   const cur=C.players[C.cur];
   const tb=$('#chest-turn');
-  tb.textContent='Ход: '+cur.name;
+  tb.innerHTML='<span class="turn-lab">Ход</span><span class="turn-name">'+cur.name+'</span>';
   tb.style.background='linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 60%),'+cur.color;
   tb.style.boxShadow='0 5px 0 rgba(0,0,0,.3),0 0 24px -6px '+cur.color+',inset 0 2px 0 rgba(255,255,255,.3)';
   $$('#chest-players .pcard').forEach((c,i)=>{
